@@ -1,5 +1,6 @@
 
 local function status_note_regex()
+    print("STATUS NOTE REGEX TEST:")
     local lines = {
         "  (use git rm --cached <file>... to unstage)",
         "use git rm --cached <file>... to unstage",
@@ -15,11 +16,12 @@ local function status_note_regex()
         assert(is, should_be[i])
         print("Passed: " .. is)
     end
+    print("\n\n")
 end
 
 
 local function file_regex()
-    print("FILE REGEX TEST:\n")
+    print("FILE REGEX TEST:")
     local lines = {
         "/home/user/documents/file.txt",
         "documents/file.txt",
@@ -55,11 +57,12 @@ local function file_regex()
         assert(match == should_be[i], "\nNo match for: " .. line)
         print("Passed: " .. match)
     end
-    print("\n\n\n")
+    print("\n\n")
 end
 
-function branch_regex()
-    lines = {
+local function branch_regex()
+    print("BRANCH REGEX TEST:")
+    local lines = {
         "  feature/caching",
         "  main",
         "  stable/release-v0.1.2",
@@ -67,11 +70,13 @@ function branch_regex()
         "  stable/release-v0.1.4",
         "* unstable/release-v0.1.5",
     }
-    for i, line in ipairs(lines) do
+    for _, line in ipairs(lines) do
         local star, branch_name = line:match("(%**)%s*(.*)")
         print(star, branch_name)
     end
-    
+    print("\n\n")
 end
 
+status_note_regex()
+file_regex()
 branch_regex()
