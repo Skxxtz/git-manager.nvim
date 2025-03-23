@@ -93,6 +93,15 @@ M.push = function()
     return result
 end
 
+M.push_all = function()
+    Binds.set_binds(Binds.binds.push_view)
+
+    CommitView.prompt = "Remote URL:"
+    CommitView.prompt = vim.fn.split(CommitView.prompt, "\n")
+
+    vim.api.nvim_buf_set_lines(Helper.buf, 0, -1, false, CommitView.prompt)
+    vim.api.nvim_win_set_cursor(Helper.win, { #CommitView.prompt, 0 })
+end
 
 --------------------
 -- Untracking
@@ -135,16 +144,14 @@ end
 Binds.is_active_repo = M.is_active_repo()
 Binds.binds = {
     commit_view = {
-        { mode = "n", map = "<C-CR>", callback = Binds.status_op, nested = CommitView.accept, after = M.show_status },
+        { mode = "n", map = "<C-CR>", callback = Binds.status_op, nested = CommitView.accept, after = M.show_status, args={git_cmd = "Git commit -m "}},
         { mode = "n", map = "<UP>",   callback = Binds.status_op, nested = CommitView.next_cached },
         { mode = "n", map = "<DOWN>", callback = Binds.status_op, nested = CommitView.prev_cached },
 
-        -- VIEW MAPPINGS
-        { mode = "n", map = "s",     action = "<Nop>" },
-        { mode = "n", map = "s",     callback = Binds.status_op, nested = M.status },
+    },
+    push_view = {
+        { mode = "n", map = "<C-CR>", callback = Binds.status_op, nested = CommitView.accept, after = M.show_status, args={git_cmd = ""}},
 
-        { mode = "n", map = "S",     action = "<Nop>" },
-        { mode = "n", map = "S",     callback = Binds.status_op, nested = M.switch },
     },
     branch_view = {
         { mode = "n", map = "r", action = "<Nop>" },
@@ -154,31 +161,30 @@ Binds.binds = {
         { mode = "n", map = "o", callback = Binds.status_op, nested = BranchView.add },
 
         { mode = "n", map = "<C-d>", action = "<Nop>" },
-        { mode = "n", map = "<C-d>", callback = Binds.status_op, nested = BranchView.delete, after = M.switch, file = true},
+        { mode = "n", map = "<C-d>", callback = Binds.status_op, nested = BranchView.delete, after = M.switch, args={file = true}},
 
-        { mode = "n", map = "<CR>", callback = Binds.status_op, nested = BranchView.switch, after = M.switch,   line = true },
+        { mode = "n", map = "<CR>", callback = Binds.status_op, nested = BranchView.switch, after = M.switch,   args={file = true} },
 
-        -- VIEW MAPPINGS
-        { mode = "n", map = "s",     action = "<Nop>" },
-        { mode = "n", map = "s",     callback = Binds.status_op, nested = M.status },
-
-        { mode = "n", map = "S",     action = "<Nop>" },
-        { mode = "n", map = "S",     callback = Binds.status_op, nested = M.switch },
     },
     defaults = {
         { mode = "n", map = "u",     action = "<Nop>" },
-        { mode = "n", map = "u",     callback = Binds.status_op, nested = M.untrack_file, after = M.show_status, line = true },
-        { mode = "n", map = "<C-u>", callback = Binds.status_op, nested = M.untrack_all,  after = M.show_status, line = true },
+        { mode = "n", map = "u",     callback = Binds.status_op, nested = M.untrack_file, after = M.show_status, args={file = true} },
+        { mode = "n", map = "<C-u>", callback = Binds.status_op, nested = M.untrack_all,  after = M.show_status, args={file = true} },
 
         { mode = "n", map = "a",     action = "<Nop>" },
-        { mode = "n", map = "a",     callback = Binds.status_op, nested = M.add_file,     after = M.show_status, line = true },
-        { mode = "n", map = "<C-a>", callback = Binds.status_op, nested = M.add_all,      after = M.show_status, line = true },
+        { mode = "n", map = "a",     callback = Binds.status_op, nested = M.add_file,     after = M.show_status, args={file = true} },
+        { mode = "n", map = "<C-a>", callback = Binds.status_op, nested = M.add_all,      after = M.show_status, args={file = true} },
 
 
         { mode = "n", map = "p",     action = "<Nop>" },
         { mode = "n", map = "p",     callback = Binds.status_op, nested = M.push },
+    },
+    init = {
+        { mode = "n", map = "i", action = "<Nop>" },
+        { mode = "n", map = "i", callback = M.status_op, nested = M.status, after = M.add_binds },
 
-        -- VIEW MAPPINGS
+    },
+    always = {
         { mode = "n", map = "S",     action = "<Nop>" },
         { mode = "n", map = "S",     callback = Binds.status_op, nested = M.switch },
 
@@ -187,11 +193,12 @@ Binds.binds = {
 
         { mode = "n", map = "<C-c>", action = "<Nop>" },
         { mode = "n", map = "<C-c>", callback = Binds.status_op, nested = M.commit_all },
-    },
-    init = {
-        { mode = "n", map = "i", action = "<Nop>" },
-        { mode = "n", map = "i", callback = M.status_op, nested = M.status, after = M.add_binds },
 
+        { mode = "n", map = "q", action = "<Nop>" },
+        { mode = "n", map = "q", callback = Binds.quit },
+
+        { mode = "n", map = "<Esc>", action = "<Nop>" },
+        { mode = "n", map = "<Esc>", callback = Binds.quit },
     }
 }
 

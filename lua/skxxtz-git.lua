@@ -36,6 +36,8 @@ M.show_menu = function (opts)
     Helpers.win = M.win
     Helpers.buf = M.buf
 
+    Binds.set_always_binds()
+
     if Binds.set_binds(Binds.binds.defaults) then
         Git.show_status()
     end

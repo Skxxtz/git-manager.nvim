@@ -2,15 +2,19 @@ local Messages = require("messages")
 local Helper = require("utils.init")
 
 local M = {
-    current_binds = {}
+    current_binds = {},
+    always_binds = {}
 }
 
-M.status_op = function(callback, after, after_args, line)
+M.status_op = function(callback, args, after, after_args)
     local result
+    args = args or {}
 
-    if line then
+    if args.line then
         local file = Helper.get_file_under_cursor()
         result = callback(file)
+    elseif args.git_cmd then
+        result = callback(args.git_cmd)
     else
         result = callback()
     end
@@ -70,12 +74,13 @@ M.set_binds = function (binds)
             else
                 vim.keymap.set(map.mode, map.map, function ()
                     local nested = map.nested or nil
+                    local args = map.args or nil
                     local after = map.after or nil
                     local after_args = map.after_args or nil
                     local line = map.line or false
 
                     if nested then
-                        map.callback(nested, after, after_args, line)
+                        map.callback(nested, args, after, after_args, line)
                     end
 
                 end, {buffer = M.buf})
@@ -83,19 +88,38 @@ M.set_binds = function (binds)
             end
         end
     end
-
-    vim.keymap.set("n", "q", function ()
-        vim.keymap.del("n", "q", {buffer = M.buf})
-        vim.keymap.del("n", "<Esc>", {buffer = M.buf})
-        vim.cmd("quit")
-    end, {buffer = M.buf })
-    vim.keymap.set("n", "<Esc>", function ()
-        vim.keymap.del("n", "q", {buffer = M.buf})
-        vim.keymap.del("n", "<Esc>", {buffer = M.buf})
-        vim.cmd("quit")
-    end, {buffer = M.buf })
-
     return M.is_active_repo
+end
+
+M.set_always_binds = function ()
+    for _, map in ipairs(M.binds.always) do
+        if map.action then
+            vim.keymap.set(map.mode, map.map, map.action, {buffer = M.buf})
+        else
+            vim.keymap.set(map.mode, map.map, function ()
+                local nested = map.nested or nil
+                local args = map.args or nil
+                local after = map.after or nil
+                local after_args = map.after_args or nil
+                local line = map.line or false
+
+                if nested then
+                    map.callback(nested, args, after, after_args, line)
+                else
+                    map.callback()
+                end
+
+            end, {buffer = M.buf})
+            M.always_binds[map.map] = map.mode
+        end
+    end
+end
+
+M.quit = function ()
+    for map, mode in pairs(M.always_binds) do
+        vim.keymap.del(mode, map, {buffer=M.buf})
+    end
+    vim.cmd("quit")
 end
 
 
