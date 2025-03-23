@@ -14,7 +14,7 @@ local function status_note_regex()
     for i, line in ipairs(lines)do
         local is = line:gsub(".*%s*%b()$", "")
         assert(is, should_be[i])
-        print("Passed: " .. is)
+        print("\27[32mPassed: \27[0m" .. is)
     end
     print("\n\n")
 end
@@ -36,6 +36,7 @@ local function file_regex()
         "	new file:   lua/git.lua",
         "	new file:   lua/git.lua\n",
         "	modified:   lua/skxxtz-git.lua\n"
+
     }
     local should_be = {
         "/home/user/documents/file.txt",
@@ -55,7 +56,7 @@ local function file_regex()
     for i, line in ipairs(lines) do  -- Use ipairs to iterate through the array
         local match = line:match(".-([%w]*[%.%/%~]+[%w%s]*[%w%/%s]*[%.%w%-%_]*)")
         assert(match == should_be[i], "\nNo match for: " .. line)
-        print("Passed: " .. match)
+        print("\27[32mPassed: \27[0m" .. match)
     end
     print("\n\n")
 end
@@ -82,7 +83,7 @@ local function branch_regex()
         local _, branch_name = line:match("(%**)%s*(.*)")
         assert(branch_name == should_be[i])
 
-        print("Passed: " .. branch_name)
+        print("\27[32mPassed: \27[0m" .. branch_name)
     end
     print("\n\n")
 end
