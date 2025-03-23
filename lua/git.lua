@@ -75,12 +75,7 @@ end
 --------------------
 M.commit_all = function()
     Binds.set_binds(Binds.binds.commit_view)
-
-    CommitView.prompt = "Commit Message:"
-    CommitView.prompt = vim.fn.split(CommitView.prompt, "\n")
-
-    vim.api.nvim_buf_set_lines(Helper.buf, 0, -1, false, CommitView.prompt)
-    vim.api.nvim_win_set_cursor(Helper.win, { #CommitView.prompt, 0 })
+    CommitView.show({prompt = "Commit Message:"})
 end
 
 
@@ -93,14 +88,10 @@ M.push = function()
     return result
 end
 
-M.push_all = function()
+M.remote_add = function()
     Binds.set_binds(Binds.binds.push_view)
 
-    CommitView.prompt = "Remote URL:"
-    CommitView.prompt = vim.fn.split(CommitView.prompt, "\n")
-
-    vim.api.nvim_buf_set_lines(Helper.buf, 0, -1, false, CommitView.prompt)
-    vim.api.nvim_win_set_cursor(Helper.win, { #CommitView.prompt, 0 })
+    CommitView.show({prompt = "Remote URL:"})
 end
 
 --------------------
@@ -151,7 +142,6 @@ Binds.binds = {
     },
     push_view = {
         { mode = "n", map = "<C-CR>", callback = Binds.status_op, nested = CommitView.accept, after = M.show_status, args={git_cmd = ""}},
-
     },
     branch_view = {
         { mode = "n", map = "r", action = "<Nop>" },
@@ -178,11 +168,13 @@ Binds.binds = {
 
         { mode = "n", map = "p",     action = "<Nop>" },
         { mode = "n", map = "p",     callback = Binds.status_op, nested = M.push },
+
+        { mode = "n", map = "<C-p>r",     action = "<Nop>" },
+        { mode = "n", map = "<C-p>r",     callback = Binds.status_op, nested = M.remote_add },
     },
     init = {
         { mode = "n", map = "i", action = "<Nop>" },
         { mode = "n", map = "i", callback = M.status_op, nested = M.status, after = M.add_binds },
-
     },
     always = {
         { mode = "n", map = "S",     action = "<Nop>" },

@@ -4,21 +4,34 @@ local M = {
     counter = -1,
     last_commit_message = {}
 }
+M.show = function (opts)
+    opts = opts or {}
+    local tmp = opts.prompt or ""
+    M.prompt = vim.fn.split(tmp, "\n")
+    M.cmd = opts.git_cmd or 'git commit -m "%s"'
+
+    vim.api.nvim_buf_set_lines(Helper.buf, 0, -1, false, M.prompt)
+    vim.api.nvim_buf_set_lines(Helper.buf, #M.prompt, #M.prompt, false, {""})
+    vim.api.nvim_win_set_cursor(Helper.win, { #M.prompt + 1, 0 })
+
+    Helper.lock_line({lower = #M.prompt, upper = nil}, {lower = nil, upper = nil})
+end
+
 M.accept = function ()
     local prompt = M.prompt or "Commit Message:"
     local lines = vim.api.nvim_buf_get_lines(Helper.buf, 0, -1, false)
-    local message = ""
+    local message_lines = {}
     if #lines >= #prompt + 1 then
         for i, line in ipairs(lines) do
             if i >= #prompt + 1 then
                 line = line:gsub('"', "'")
-                message = message .. line .. "\n"
+                table.insert(message_lines, line)
             end
         end
     end
+    local message = table.concat(message_lines, "\n")
     table.insert(M.last_commit_message, message)
-    local cmd = string.format('git commit -m "%s"', message)
-
+    local cmd = string.format(M.cmd, message)
     Helper.execute_shell(cmd)
 end
 M.next_cached = function ()

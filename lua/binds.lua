@@ -60,6 +60,11 @@ M.set_binds = function (binds)
             M.bindgroup = "branch"
             changed = true
         end
+    elseif binds == M.binds.push_view then
+        if  M.bindgroup ~= "push" then
+            M.bindgroup = "push"
+            changed = true
+        end
     end
 
     if changed then
