@@ -48,7 +48,6 @@ M.trim = function (string)
         return string:match("%s*(.*)%s*")
     end
     return ""
-    
 end
 
 
