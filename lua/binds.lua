@@ -13,7 +13,7 @@ M.status_op = function(callback, after, after_args, line)
         result = callback()
     end
 
-    if after then
+    if after and not result then
         if after_args then
             after(after_args)
         else

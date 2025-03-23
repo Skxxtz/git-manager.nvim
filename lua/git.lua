@@ -124,17 +124,6 @@ M.switch = function()
     local branches = M.get_branches()
     Helper.print_to_buffer(branches)
     vim.keymap.set("n", "<CR>", function()
-        vim.cmd("mapclear <buffer>")
-        local line = vim.api.nvim_get_current_line()
-        local _, branch_name = line:match("(%**)%s*(.*)")
-        local r = Helper.execute_shell("git switch " .. branch_name, true)
-        if r then
-            if string.find(r, "Switched") then
-                Helper.print_to_buffer(M.switch())
-            elseif string.find(r, "error:") then
-                Helper.print_to_buffer(r)
-            end
-        end
     end, { buffer = Helper.buf })
 end
 M.get_branches = function()
@@ -157,6 +146,7 @@ Binds.binds = {
         { mode = "n", map = "r", callback = Binds.status_op, nested = BranchView.rename },
         { mode = "n", map = "o", action = "<Nop>" },
         { mode = "n", map = "o", callback = Binds.status_op, nested = BranchView.add },
+        { mode = "n", map = "<C-CR>", callback = Binds.status_op, nested = BranchView.switch, after = M.switch, line = true },
     },
     defaults = {
         { mode = "n", map = "u",     action = "<Nop>" },

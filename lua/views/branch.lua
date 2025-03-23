@@ -1,6 +1,19 @@
 local Helper = require("utils.init")
 local M = {}
 
+M.switch = function ()
+    local line = vim.api.nvim_get_current_line()
+    local _, branch_name = line:match("(%**)%s*(.*)")
+    local r = Helper.execute_shell("git switch " .. branch_name, true)
+    if r then
+        if string.find(r, "Switched") then
+            return true
+        elseif string.find(r, "error:") then
+            Helper.print_to_buffer(r)
+            return false
+        end
+    end
+end
 M.rename = function ()
     vim.api.nvim_clear_autocmds({group = 'BranchAu'})
     local line = vim.api.nvim_get_current_line()
