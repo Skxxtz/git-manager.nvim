@@ -25,9 +25,6 @@ M.eval_bind = function(map)
         result = map.nested()
     end
 
-    if result then
-        print(result)
-    end
     if map.after and not result then
         if map.after_args then
             map.after(map.after_args)
@@ -114,14 +111,17 @@ M.binds = {
         { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, new_binds = "defaults"},
     },
     ["branch_view"] = {
-        { mode = "n", map = "r", action = "<Nop>" },
-        { mode = "n", map = "r", callback = M.eval_bind, nested = BranchView.rename },
+        { mode = "n", map = "rn", action = "<Nop>" },
+        { mode = "n", map = "rn", callback = M.eval_bind, nested = BranchView.rename },
 
         { mode = "n", map = "o", action = "<Nop>" },
         { mode = "n", map = "o", callback = M.eval_bind, nested = BranchView.add },
 
         { mode = "n", map = "m", action = "<Nop>" },
-        { mode = "n", map = "m", callback = M.eval_bind, nested = Git.merge },
+        { mode = "n", map = "m", callback = M.eval_bind, nested = Git.branch_action, args = {git_cmd = "git merge %"}},
+
+        { mode = "n", map = "rb", action = "<Nop>" },
+        { mode = "n", map = "rb", callback = M.eval_bind, nested = Git.branch_action, args = {git_cmd = "git rebase %s"}},
 
         { mode = "n", map = "<C-d>", action = "<Nop>" },
         { mode = "n", map = "<C-d>", callback = M.eval_bind, nested = BranchView.delete, after = Git.switch, args={line = true}},
