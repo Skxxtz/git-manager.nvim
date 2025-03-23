@@ -13,6 +13,18 @@ M.switch = function ()
         end
     end
 end
+M.delete = function ()
+    local line = vim.api.nvim_get_current_line()
+    local _, branch_name = line:match("(%**)%s*(.*)")
+    local r;
+    if branch_name ~= "main" and branch_name ~= "master" then
+        r = Helper.execute_shell("git branch --delete " .. branch_name)
+        return false
+    else
+        r = "error: you should not remove your main/master branch!"
+        return r
+    end
+end
 M.rename = function ()
     vim.api.nvim_clear_autocmds({group = 'BranchAu'})
     local line = vim.api.nvim_get_current_line()
