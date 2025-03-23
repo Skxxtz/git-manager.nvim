@@ -1,7 +1,7 @@
 local Helper = require("utils.init")
 local M = {}
 
-M.switch = function ()
+M.switch = function (_)
     local line = vim.api.nvim_get_current_line()
     local _, branch_name = line:match("(%**)%s*(.*)")
     local r = Helper.execute_shell("git switch " .. branch_name, true)
@@ -13,7 +13,7 @@ M.switch = function ()
         end
     end
 end
-M.delete = function ()
+M.delete = function (_)
     local line = vim.api.nvim_get_current_line()
     local _, branch_name = line:match("(%**)%s*(.*)")
     local r;
@@ -25,7 +25,7 @@ M.delete = function ()
         return r
     end
 end
-M.rename = function ()
+M.rename = function (_)
     vim.api.nvim_clear_autocmds({group = 'BranchAu'})
     local line = vim.api.nvim_get_current_line()
     local _, before = line:match("(%**)%s*(.*)")
@@ -43,7 +43,8 @@ M.rename = function ()
         end
     })
 end
-M.add = function ()
+M.add = function (args)
+    args = args or {}
     vim.api.nvim_clear_autocmds({group = 'BranchAu'})
 
     local row, _ = unpack(vim.api.nvim_win_get_cursor(Helper.win))
