@@ -25,9 +25,6 @@ M.eval_bind = function(map)
         result = map.nested()
     end
 
-    if result then
-        print(result)
-    end
     if map.after and not result then
         if map.after_args then
             map.after(map.after_args)
@@ -50,17 +47,17 @@ M.set_binds = function (binds)
 
 
         for map, mode in pairs(M.current_binds) do
-            vim.keymap.del(mode, map, {buffer=M.buf})
+            vim.keymap.del(mode, map, {buffer=Helper.buf})
         end
         M.current_binds = {}
         vim.api.nvim_clear_autocmds({group = 'BranchAu'})
         for _, map in ipairs(binds) do
             if map.action then
-                vim.keymap.set(map.mode, map.map, map.action, {buffer = M.buf})
+                vim.keymap.set(map.mode, map.map, map.action, {buffer = Helper.buf})
             else
                 vim.keymap.set(map.mode, map.map, function ()
                     map.callback(map)
-                end, {buffer = M.buf})
+                end, {buffer = Helper.buf})
                 M.current_binds[map.map] = map.mode
             end
         end
@@ -72,32 +69,35 @@ end
 M.set_always_binds = function ()
     for _, map in ipairs(M.binds["always"]) do
         if map.action then
-            vim.keymap.set(map.mode, map.map, map.action, {buffer = M.buf})
+            vim.keymap.set(map.mode, map.map, map.action, {buffer = Helper.buf})
         else
             vim.keymap.set(map.mode, map.map, function ()
                 map.callback(map)
-            end, {buffer = M.buf})
+            end, {buffer = Helper.buf})
             M.always_binds[map.map] = map.mode
         end
     end
 end
 
+
 M.quit = function ()
-    for map, mode in pairs(M.always_binds) do
-        vim.keymap.del(mode, map, {buffer=M.buf})
+    if Helper.win and Helper.buf then
+        for map, mode in pairs(M.always_binds) do
+            vim.keymap.del(mode, map, {buffer=Helper.buf})
+        end
+
+        for map, mode in pairs(M.current_binds) do
+            vim.keymap.del(mode, map, {buffer=Helper.buf})
+        end
+
+        M.current_binds = {}
+        M.always_binds = {}
+        M.bindgroup = nil
+
+        vim.api.nvim_buf_delete(Helper.buf, {force = true})
+        Helper.buf = nil
     end
-
-    for map, mode in pairs(M.current_binds) do
-        vim.keymap.del(mode, map, {buffer=M.buf})
-    end
-
-    M.current_binds = {}
-    M.always_binds = {}
-    M.bindgroup = nil
-
-    vim.cmd("quit")
 end
-
 
 
 M.binds = {
@@ -111,14 +111,17 @@ M.binds = {
         { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, new_binds = "defaults"},
     },
     ["branch_view"] = {
-        { mode = "n", map = "r", action = "<Nop>" },
-        { mode = "n", map = "r", callback = M.eval_bind, nested = BranchView.rename },
+        { mode = "n", map = "rn", action = "<Nop>" },
+        { mode = "n", map = "rn", callback = M.eval_bind, nested = BranchView.rename },
 
         { mode = "n", map = "o", action = "<Nop>" },
         { mode = "n", map = "o", callback = M.eval_bind, nested = BranchView.add },
 
         { mode = "n", map = "m", action = "<Nop>" },
-        { mode = "n", map = "m", callback = M.eval_bind, nested = Git.merge },
+        { mode = "n", map = "m", callback = M.eval_bind, nested = Git.branch_action, args = {git_cmd = "git merge %"}},
+
+        { mode = "n", map = "rb", action = "<Nop>" },
+        { mode = "n", map = "rb", callback = M.eval_bind, nested = Git.branch_action, args = {git_cmd = "git rebase %s"}},
 
         { mode = "n", map = "<C-d>", action = "<Nop>" },
         { mode = "n", map = "<C-d>", callback = M.eval_bind, nested = BranchView.delete, after = Git.switch, args={line = true}},

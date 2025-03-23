@@ -121,13 +121,13 @@ M.switch = function()
     local branches = M.get_branches()
     Helper.print_to_buffer(branches)
 end
-M.merge = function (git_cmd)
+M.branch_action = function (git_cmd)
     git_cmd = git_cmd or "git merge %s"
     local lines = vim.api.nvim_buf_get_lines(Helper.buf, 0, -1, false)
     local _, line = vim.api.nvim_get_current_line():match("(%**)%s*(.*)")
     local active_branch = nil
     for _, l in ipairs(lines) do
-        local active, branch_name = l:match("(%**)%s*(.*)")
+        local active, branch_name = l:match("%s*(%*)%s*(.*)")
         if active then
             active_branch = branch_name
         end
