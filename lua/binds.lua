@@ -1,7 +1,9 @@
 local Messages = require("messages")
 local Helper = require("utils.init")
 
-local M = {}
+local M = {
+    current_binds = {}
+}
 
 M.status_op = function(callback, after, after_args, line)
     local result
@@ -57,7 +59,10 @@ M.set_binds = function (binds)
     end
 
     if changed then
-        vim.cmd("mapclear <buffer>")
+        for map, mode in pairs(M.current_binds) do
+            vim.keymap.del(mode, map, {buffer=M.buf})
+        end
+        M.current_binds = {}
         vim.api.nvim_clear_autocmds({group = 'BranchAu'})
         for _, map in ipairs(binds) do
             if map.action then
@@ -74,6 +79,7 @@ M.set_binds = function (binds)
                     end
 
                 end, {buffer = M.buf})
+                M.current_binds[map.map] = map.mode
             end
         end
     end

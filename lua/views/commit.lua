@@ -5,6 +5,7 @@ local M = {
     last_commit_message = {}
 }
 M.accept = function ()
+    print("CR PRESSED")
     local prompt = M.prompt or "Commit Message:"
     local lines = vim.api.nvim_buf_get_lines(Helper.buf, 0, -1, false)
     local message = ""

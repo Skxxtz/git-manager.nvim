@@ -138,15 +138,32 @@ Binds.binds = {
         { mode = "n", map = "<C-CR>", callback = Binds.status_op, nested = CommitView.accept, after = M.show_status },
         { mode = "n", map = "<UP>",   callback = Binds.status_op, nested = CommitView.next_cached },
         { mode = "n", map = "<DOWN>", callback = Binds.status_op, nested = CommitView.prev_cached },
+
+        -- VIEW MAPPINGS
+        { mode = "n", map = "s",     action = "<Nop>" },
+        { mode = "n", map = "s",     callback = Binds.status_op, nested = M.status },
+
+        { mode = "n", map = "S",     action = "<Nop>" },
+        { mode = "n", map = "S",     callback = Binds.status_op, nested = M.switch },
     },
     branch_view = {
         { mode = "n", map = "r", action = "<Nop>" },
         { mode = "n", map = "r", callback = Binds.status_op, nested = BranchView.rename },
+
         { mode = "n", map = "o", action = "<Nop>" },
         { mode = "n", map = "o", callback = Binds.status_op, nested = BranchView.add },
+
         { mode = "n", map = "<C-d>", action = "<Nop>" },
         { mode = "n", map = "<C-d>", callback = Binds.status_op, nested = BranchView.delete, after = M.switch, file = true},
+
         { mode = "n", map = "<CR>", callback = Binds.status_op, nested = BranchView.switch, after = M.switch, line = true },
+
+        -- VIEW MAPPINGS
+        { mode = "n", map = "s",     action = "<Nop>" },
+        { mode = "n", map = "s",     callback = Binds.status_op, nested = M.status },
+
+        { mode = "n", map = "S",     action = "<Nop>" },
+        { mode = "n", map = "S",     callback = Binds.status_op, nested = M.switch },
     },
     defaults = {
         { mode = "n", map = "u",     action = "<Nop>" },
@@ -163,6 +180,7 @@ Binds.binds = {
         { mode = "n", map = "p",     action = "<Nop>" },
         { mode = "n", map = "p",     callback = Binds.status_op, nested = M.push },
 
+        -- VIEW MAPPINGS
         { mode = "n", map = "S",     action = "<Nop>" },
         { mode = "n", map = "S",     callback = Binds.status_op, nested = M.switch },
 
