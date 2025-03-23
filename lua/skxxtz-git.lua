@@ -24,7 +24,7 @@ M.show_menu = function (opts)
         win = A.win,
     }
 
-    M.buf = M.buf or vim.api.nvim_create_buf(true, true)
+    M.buf = Helpers.buf or vim.api.nvim_create_buf(false, true)
     M.win = vim.api.nvim_open_win(M.buf, true, win_config)
 
     vim.api.nvim_create_augroup("BranchAu", {clear = false})

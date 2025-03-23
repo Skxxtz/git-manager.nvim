@@ -50,17 +50,17 @@ M.set_binds = function (binds)
 
 
         for map, mode in pairs(M.current_binds) do
-            vim.keymap.del(mode, map, {buffer=M.buf})
+            vim.keymap.del(mode, map, {buffer=Helper.buf})
         end
         M.current_binds = {}
         vim.api.nvim_clear_autocmds({group = 'BranchAu'})
         for _, map in ipairs(binds) do
             if map.action then
-                vim.keymap.set(map.mode, map.map, map.action, {buffer = M.buf})
+                vim.keymap.set(map.mode, map.map, map.action, {buffer = Helper.buf})
             else
                 vim.keymap.set(map.mode, map.map, function ()
                     map.callback(map)
-                end, {buffer = M.buf})
+                end, {buffer = Helper.buf})
                 M.current_binds[map.map] = map.mode
             end
         end
@@ -72,32 +72,35 @@ end
 M.set_always_binds = function ()
     for _, map in ipairs(M.binds["always"]) do
         if map.action then
-            vim.keymap.set(map.mode, map.map, map.action, {buffer = M.buf})
+            vim.keymap.set(map.mode, map.map, map.action, {buffer = Helper.buf})
         else
             vim.keymap.set(map.mode, map.map, function ()
                 map.callback(map)
-            end, {buffer = M.buf})
+            end, {buffer = Helper.buf})
             M.always_binds[map.map] = map.mode
         end
     end
 end
 
+
 M.quit = function ()
-    for map, mode in pairs(M.always_binds) do
-        vim.keymap.del(mode, map, {buffer=M.buf})
+    if Helper.win and Helper.buf then
+        for map, mode in pairs(M.always_binds) do
+            vim.keymap.del(mode, map, {buffer=Helper.buf})
+        end
+
+        for map, mode in pairs(M.current_binds) do
+            vim.keymap.del(mode, map, {buffer=Helper.buf})
+        end
+
+        M.current_binds = {}
+        M.always_binds = {}
+        M.bindgroup = nil
+
+        vim.api.nvim_buf_delete(Helper.buf, {force = true})
+        Helper.buf = nil
     end
-
-    for map, mode in pairs(M.current_binds) do
-        vim.keymap.del(mode, map, {buffer=M.buf})
-    end
-
-    M.current_binds = {}
-    M.always_binds = {}
-    M.bindgroup = nil
-
-    vim.cmd("quit")
 end
-
 
 
 M.binds = {

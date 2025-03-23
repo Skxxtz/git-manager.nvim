@@ -1,4 +1,7 @@
-local M = {}
+local M = {
+    win = nil,
+    buf = nil
+}
 
 M.get_file_under_cursor = function ()
     local line = vim.api.nvim_get_current_line()
@@ -81,7 +84,6 @@ M.trim = function (string)
     end
     return ""
 end
-
 
 
 
