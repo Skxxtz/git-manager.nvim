@@ -7,13 +7,25 @@ M.get_file_under_cursor = function ()
     return match
 end
 
-M.print_to_buffer = function (string, buffer)
+M.print_to_buffer = function (line, buffer, highlights)
     buffer = buffer or M.buf
-    if string then
-        if type(string) == "string" then
-            string = vim.fn.split(string, "\n")
+    highlights = highlights or {
+        ["error:"] = "ErrorMsg",
+        ["fatal"] = "ErrorMsg",
+    }
+    if line then
+        if type(line) == "string" then
+            line = vim.fn.split(line, "\n")
         end
-        vim.api.nvim_buf_set_lines(buffer, 0, -1, true, string)
+        vim.api.nvim_buf_set_lines(buffer, 0, -1, true, line)
+        for sub, hl_group in pairs(highlights)do
+            for i, l in ipairs(line) do
+                local x1, x2 = string.find(l, sub, 1, true)
+                if x1 and x2 then
+                    vim.api.nvim_buf_add_highlight(buffer, M.ns_id, hl_group, i - 1, x1 - 1, x2  )
+                end
+            end
+        end
     end
 end
 
@@ -36,6 +48,7 @@ M.trim = function (string)
         return string:match("%s*(.*)%s*")
     end
     return ""
+    
 end
 
 

@@ -123,8 +123,6 @@ M.switch = function()
     Binds.set_binds(Binds.binds.branch_view)
     local branches = M.get_branches()
     Helper.print_to_buffer(branches)
-    vim.keymap.set("n", "<CR>", function()
-    end, { buffer = Helper.buf })
 end
 M.get_branches = function()
     local branches_raw = Helper.execute_shell("git branch")
@@ -146,7 +144,7 @@ Binds.binds = {
         { mode = "n", map = "r", callback = Binds.status_op, nested = BranchView.rename },
         { mode = "n", map = "o", action = "<Nop>" },
         { mode = "n", map = "o", callback = Binds.status_op, nested = BranchView.add },
-        { mode = "n", map = "<C-CR>", callback = Binds.status_op, nested = BranchView.switch, after = M.switch, line = true },
+        { mode = "n", map = "<CR>", callback = Binds.status_op, nested = BranchView.switch, after = M.switch, line = true },
     },
     defaults = {
         { mode = "n", map = "u",     action = "<Nop>" },

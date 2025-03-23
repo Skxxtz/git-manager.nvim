@@ -13,6 +13,9 @@ M.status_op = function(callback, after, after_args, line)
         result = callback()
     end
 
+    if result then
+        print(result)
+    end
     if after and not result then
         if after_args then
             after(after_args)

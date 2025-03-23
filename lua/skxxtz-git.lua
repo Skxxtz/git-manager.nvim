@@ -27,6 +27,8 @@ M.show_menu = function (opts)
 
     vim.api.nvim_create_augroup("BranchAu", {clear = false})
 
+    Helpers.ns_id = vim.api.nvim_create_namespace("MyHighlight")
+    vim.cmd("highlight MyHighlight guibg=Yellow guifg=Black")
 
     vim.wo[M.win].foldmethod = "manual"
 

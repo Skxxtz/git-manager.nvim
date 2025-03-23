@@ -7,10 +7,9 @@ M.switch = function ()
     local r = Helper.execute_shell("git switch " .. branch_name, true)
     if r then
         if string.find(r, "Switched") then
-            return true
-        elseif string.find(r, "error:") then
-            Helper.print_to_buffer(r)
             return false
+        elseif string.find(r, "error:") then
+            return r
         end
     end
 end
