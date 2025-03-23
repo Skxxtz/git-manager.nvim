@@ -121,7 +121,8 @@ M.switch = function()
     local branches = M.get_branches()
     Helper.print_to_buffer(branches)
 end
-M.merge = function ()
+M.merge = function (git_cmd)
+    git_cmd = git_cmd or "git merge %s"
     local lines = vim.api.nvim_buf_get_lines(Helper.buf, 0, -1, false)
     local _, line = vim.api.nvim_get_current_line():match("(%**)%s*(.*)")
     local active_branch = nil
@@ -132,7 +133,7 @@ M.merge = function ()
         end
     end
     if active_branch and active_branch ~= line then
-        local cmd = string.format("git merge --rebase %s", line)
+        local cmd = string.format(git_cmd, line)
         Helper.execute_shell(cmd)
     end
 end
