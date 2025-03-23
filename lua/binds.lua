@@ -85,9 +85,13 @@ M.set_binds = function (binds)
     end
 
     vim.keymap.set("n", "q", function ()
+        vim.keymap.del("n", "q", {buffer = M.buf})
+        vim.keymap.del("n", "<Esc>", {buffer = M.buf})
         vim.cmd("quit")
     end, {buffer = M.buf })
     vim.keymap.set("n", "<Esc>", function ()
+        vim.keymap.del("n", "q", {buffer = M.buf})
+        vim.keymap.del("n", "<Esc>", {buffer = M.buf})
         vim.cmd("quit")
     end, {buffer = M.buf })
 
