@@ -58,6 +58,7 @@ M.set_binds = function (binds)
 
     if changed then
         vim.cmd("mapclear <buffer>")
+        vim.api.nvim_clear_autocmds({group = 'BranchAu'})
         for _, map in ipairs(binds) do
             if map.action then
                 vim.keymap.set(map.mode, map.map, map.action, {buffer = M.buf})
