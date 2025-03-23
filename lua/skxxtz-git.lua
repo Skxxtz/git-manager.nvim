@@ -16,7 +16,7 @@ M.show_menu = function (opts)
     A.win = vim.api.nvim_get_current_win()
     A.buf = vim.api.nvim_win_get_buf(A.win)
 
-    local height = opts.height or math.floor(vim.o.lines * 0.2)
+    local height = opts.height or 10
     local win_config = {
         split = "below",
         height = height,
