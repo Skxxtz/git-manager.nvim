@@ -43,15 +43,18 @@ end
 -- Adding
 --------------------
 M.add_file = function(file)
-    local result = Helper.execute_shell("git add " .. file)
-    if #result > 0 then
-        M.last_cmd = M.add_file
-    else
-        if M.last_cmd == M.status then
-            result = M.last_cmd()
+    if file then
+        local result = Helper.execute_shell("git add " .. file)
+        if #result > 0 then
+            M.last_cmd = M.add_file
+        else
+            if M.last_cmd == M.status then
+                result = M.last_cmd()
+            end
         end
+        return result
     end
-    return result
+    return false
 end
 M.add_all = function()
     local result = Helper.execute_shell("git add .")
@@ -90,8 +93,13 @@ end
 -- Untracking
 --------------------
 M.untrack_file = function(file)
-    local result = Helper.execute_shell("git reset " .. file)
-    return result
+    if file then
+        local result = Helper.execute_shell("git reset " .. file)
+        if result and string.find(result, "error") then
+            return result
+        end
+    end
+    return false
 end
 M.untrack_all = function()
     local result = Helper.execute_shell("git reset")
