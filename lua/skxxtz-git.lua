@@ -1,9 +1,10 @@
 local Helpers = require("utils.init")
 
-local A = {}
-local M = {}
 local Binds = require("binds")
 local Git = require("git")
+
+local A = {}
+local M = {}
 
 unpack = unpack or table.unpack
 

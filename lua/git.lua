@@ -156,7 +156,7 @@ Binds.binds = {
         { mode = "n", map = "<C-d>", action = "<Nop>" },
         { mode = "n", map = "<C-d>", callback = Binds.status_op, nested = BranchView.delete, after = M.switch, file = true},
 
-        { mode = "n", map = "<CR>", callback = Binds.status_op, nested = BranchView.switch, after = M.switch, line = true },
+        { mode = "n", map = "<CR>", callback = Binds.status_op, nested = BranchView.switch, after = M.switch,   line = true },
 
         -- VIEW MAPPINGS
         { mode = "n", map = "s",     action = "<Nop>" },
