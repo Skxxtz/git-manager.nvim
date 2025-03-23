@@ -69,9 +69,8 @@ M.set_binds = function (binds)
     return false
 end
 
-M.set_always_binds = function (key)
-    key = key or "always"
-    for _, map in ipairs(M.binds[key]) do
+M.set_always_binds = function ()
+    for _, map in ipairs(M.binds["always"]) do
         if map.action then
             vim.keymap.set(map.mode, map.map, map.action, {buffer = M.buf})
         else
@@ -87,6 +86,15 @@ M.quit = function ()
     for map, mode in pairs(M.always_binds) do
         vim.keymap.del(mode, map, {buffer=M.buf})
     end
+
+    for map, mode in pairs(M.current_binds) do
+        vim.keymap.del(mode, map, {buffer=M.buf})
+    end
+
+    M.current_binds = {}
+    M.always_binds = {}
+    M.bindgroup = nil
+
     vim.cmd("quit")
 end
 
@@ -94,13 +102,13 @@ end
 
 M.binds = {
     ["commit_view"] = {
-        { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, args={git_cmd = "Git commit -m "}},
+        { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, args={git_cmd = "Git commit -m "}, new_binds = "defaults"},
         { mode = "n", map = "<UP>",   callback = M.eval_bind, nested = CommitView.next_cached },
         { mode = "n", map = "<DOWN>", callback = M.eval_bind, nested = CommitView.prev_cached },
 
     },
     ["remote_add_view"] = {
-        { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, args={git_cmd = ""}},
+        { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, args={git_cmd = ""}, new_binds = "defaults"},
     },
     ["branch_view"] = {
         { mode = "n", map = "r", action = "<Nop>" },
@@ -110,19 +118,19 @@ M.binds = {
         { mode = "n", map = "o", callback = M.eval_bind, nested = BranchView.add },
 
         { mode = "n", map = "<C-d>", action = "<Nop>" },
-        { mode = "n", map = "<C-d>", callback = M.eval_bind, nested = BranchView.delete, after = Git.switch, args={file = true}},
+        { mode = "n", map = "<C-d>", callback = M.eval_bind, nested = BranchView.delete, after = Git.switch, args={line = true}},
 
-        { mode = "n", map = "<CR>", callback = M.eval_bind, nested = BranchView.switch, after = Git.switch,   args={file = true} },
+        { mode = "n", map = "<CR>", callback = M.eval_bind, nested = BranchView.switch, after = Git.switch,   args={line = true} },
 
     },
     ["defaults"] = {
         { mode = "n", map = "u",     action = "<Nop>" },
-        { mode = "n", map = "u",     callback = M.eval_bind, nested = Git.untrack_file, after = Git.show_status, args={file = true} },
-        { mode = "n", map = "<C-u>", callback = M.eval_bind, nested = Git.untrack_all,  after = Git.show_status, args={file = true} },
+        { mode = "n", map = "u",     callback = M.eval_bind, nested = Git.untrack_file, after = Git.show_status, args={line = true} },
+        { mode = "n", map = "<C-u>", callback = M.eval_bind, nested = Git.untrack_all,  after = Git.show_status, args={line = true} },
 
         { mode = "n", map = "a",     action = "<Nop>" },
-        { mode = "n", map = "a",     callback = M.eval_bind, nested = Git.add_file,     after = Git.show_status, args={file = true} },
-        { mode = "n", map = "<C-a>", callback = M.eval_bind, nested = Git.add_all,      after = Git.show_status, args={file = true} },
+        { mode = "n", map = "a",     callback = M.eval_bind, nested = Git.add_file,     after = Git.show_status, args={line = true} },
+        { mode = "n", map = "<C-a>", callback = M.eval_bind, nested = Git.add_all,      after = Git.show_status, args={line = true} },
 
 
         { mode = "n", map = "p",     action = "<Nop>" },
