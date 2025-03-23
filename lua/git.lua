@@ -134,7 +134,8 @@ M.merge = function (git_cmd)
     end
     if active_branch and active_branch ~= line then
         local cmd = string.format(git_cmd, line)
-        return Helper.execute_shell(cmd)
+        print(cmd)
+        -- return Helper.execute_shell(cmd)
     end
     return false
 end
