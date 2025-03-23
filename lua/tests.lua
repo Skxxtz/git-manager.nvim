@@ -70,9 +70,19 @@ local function branch_regex()
         "  stable/release-v0.1.4",
         "* unstable/release-v0.1.5",
     }
-    for _, line in ipairs(lines) do
+    local should_be = {
+        "feature/caching",
+        "main",
+        "stable/release-v0.1.2",
+        "stable/release-v0.1.3",
+        "stable/release-v0.1.4",
+        "unstable/release-v0.1.5",
+    }
+    for i, line in ipairs(lines) do
         local star, branch_name = line:match("(%**)%s*(.*)")
-        print(star, branch_name)
+        assert(branch_name == should_be[i])
+
+        print("Passed: " .. branch_name)
     end
     print("\n\n")
 end
