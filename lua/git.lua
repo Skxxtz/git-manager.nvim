@@ -86,7 +86,7 @@ M.push = function()
 end
 
 M.remote_add = function()
-    CommitView.show({prompt = "Remote URL:"})
+    CommitView.show({prompt = "Remote URL:", git_cmd = "git remote add %s"})
 end
 
 --------------------
