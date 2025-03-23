@@ -1,8 +1,7 @@
 local M = {}
 
 M.get_file_under_cursor = function ()
-    local row, _ = unpack(vim.api.nvim_win_get_cursor(M.win))
-    local line = vim.api.nvim_buf_get_lines(M.buf, row-1, row, false)[1]
+    local line = vim.api.nvim_get_current_line()
     local match = line:match(".-([%w]*[%.%/%~]+[%w%s]*[%w%/%s]*[%.%w%-%_]*)")
     return match
 end
@@ -24,10 +23,10 @@ M.lock_line = function (row_bound, col_bound, fixed_lines)
                 local num_cols = #vim.api.nvim_get_current_line()
                 if  (row_bound.lower and (num_lines <= row_bound.lower)) or
                     (fixed_lines and num_lines <= fixed_lines) then
-                    vim.api.nvim_buf_set_lines(M.buf, M.cursor_position[1]-1, M.cursor_position[1]-1, false, {string.rep(" ", col_bound.lower)})
+                    vim.api.nvim_buf_set_lines(M.buf, M.cursor_position[1]-1, M.cursor_position[1]-1, false, {string.rep(" ", col_bound.lower or 0)})
                 end
                 if  (col_bound.lower and (num_cols <= col_bound.lower)) then
-                    vim.api.nvim_buf_set_lines(M.buf, M.cursor_position[1]-1, M.cursor_position[1], false, {string.rep(" ", col_bound.lower)})
+                    vim.api.nvim_buf_set_lines(M.buf, M.cursor_position[1]-1, M.cursor_position[1], false, {string.rep(" ", col_bound.lower or 0)})
                     M.cursor_position[2] = col_bound.lower + 1
                 end
 
