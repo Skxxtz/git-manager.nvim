@@ -45,6 +45,12 @@ M.set_binds = function (binds)
             M.bindgroup = "commit"
             changed = true
         end
+
+    elseif binds == M.binds.branch_view then
+        if  M.bindgroup ~= "branch" then
+            M.bindgroup = "branch"
+            changed = true
+        end
     end
 
     if changed then

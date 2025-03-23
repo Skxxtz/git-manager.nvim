@@ -3,10 +3,7 @@ local BranchView = require("views.branch")
 local Binds = require("binds")
 local Helper = require("utils.init")
 
-local M = {
-    BranchView = BranchView,
-    CommitView = CommitView,
-}
+local M = {}
 
 
 --------------------
@@ -123,7 +120,7 @@ end
 -- Switch
 --------------------
 M.switch = function()
-    Binds.set_binds(Binds.binds.defaults)
+    Binds.set_binds(Binds.binds.branch_view)
     local branches = M.get_branches()
     Helper.print_to_buffer(branches)
     vim.keymap.set("n", "<CR>", function()
@@ -146,16 +143,15 @@ end
 Binds.is_active_repo = M.is_active_repo()
 Binds.binds = {
     commit_view = {
-        { mode = "n", map = "<C-CR>", callback = Binds.status_op, nested = M.CommitView.accept },
-        { mode = "n", map = "<UP>",   callback = Binds.status_op, nested = M.CommitView.next_cached },
-        { mode = "n", map = "<DOWN>", callback = Binds.status_op, nested = M.CommitView.prev_cached },
+        { mode = "n", map = "<C-CR>", callback = Binds.status_op, nested = CommitView.accept, after = M.show_status },
+        { mode = "n", map = "<UP>",   callback = Binds.status_op, nested = CommitView.next_cached },
+        { mode = "n", map = "<DOWN>", callback = Binds.status_op, nested = CommitView.prev_cached },
     },
     branch_view = {
         { mode = "n", map = "r", action = "<Nop>" },
-        { mode = "n", map = "r", callback = Binds.status_op, nested = M.BranchView.rename },
+        { mode = "n", map = "r", callback = Binds.status_op, nested = BranchView.rename },
         { mode = "n", map = "o", action = "<Nop>" },
-        { mode = "n", map = "o", callback = Binds.status_op, nested = M.BranchView.add },
-
+        { mode = "n", map = "o", callback = Binds.status_op, nested = BranchView.add },
     },
     defaults = {
         { mode = "n", map = "u",     action = "<Nop>" },

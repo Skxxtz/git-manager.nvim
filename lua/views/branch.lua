@@ -1,5 +1,6 @@
 local Helper = require("utils.init")
 local M = {}
+
 M.rename = function ()
     vim.api.nvim_clear_autocmds({group = 'BranchAu'})
     local line = vim.api.nvim_get_current_line()
@@ -27,6 +28,7 @@ M.add = function ()
 
     M.cursor_position = {row + 1, 2}
     M.num_lines = vim.api.nvim_buf_line_count(Helper.buf)
+    print(vim.inspect(M.cursor_position))
 
     vim.cmd("startinsert")
     vim.cmd("normal! $")
