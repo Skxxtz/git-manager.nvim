@@ -31,6 +31,14 @@ M.execute_shell = function (command, show)
     return nil
 end
 
+M.trim = function (string)
+    if string then
+        return string:match("%s*(.*)%s*")
+    end
+    return ""
+end
+
+
 
 
 return M
