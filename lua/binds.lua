@@ -1,32 +1,38 @@
 local Messages = require("messages")
 local Helper = require("utils.init")
+local BranchView = require("views.branch")
+local CommitView = require("views.commit")
+local Git = require("git")
+
 
 local M = {
     current_binds = {},
     always_binds = {}
 }
 
-M.status_op = function(callback, args, after, after_args)
+M.eval_bind = function(map)
     local result
-    args = args or {}
+    if map.new_binds then
+        M.set_binds(map.new_binds)
+    end
 
-    if args.line then
+    if map.args and map.args.line then
         local file = Helper.get_file_under_cursor()
-        result = callback(file)
-    elseif args.git_cmd then
-        result = callback(args.git_cmd)
+        result = map.nested(file)
+    elseif map.args and map.args.git_cmd then
+        result = map.nested(map.args.git_cmd)
     else
-        result = callback()
+        result = map.nested()
     end
 
     if result then
         print(result)
     end
-    if after and not result then
-        if after_args then
-            after(after_args)
+    if map.after and not result then
+        if map.after_args then
+            map.after(map.after_args)
         else
-            after()
+            map.after()
         end
     else
         Helper.print_to_buffer(result)
@@ -34,40 +40,15 @@ M.status_op = function(callback, args, after, after_args)
 end
 
 M.set_binds = function (binds)
-    local changed = false
-    if binds == M.binds.defaults then
-        if M.is_active_repo then
-            if M.bindgroup ~= "defaults" then
-                M.bindgroup = "defaults"
-                changed = true
-            end
-        else
-            if M.bindgroup ~= "init" then
-                M.bindgroup = "init"
-                binds = M.binds.init
-                Helper.print_to_buffer(Messages.is_no_repo)
-                changed = true
-            end
+    if binds and binds ~= M.bindgroup then
+        if not Git.is_active_repo then
+            binds = M.binds.init
+            Helper.print_to_buffer(Messages.is_no_repo)
         end
-    elseif binds == M.binds.commit_view then
-        if M.bindgroup ~= "commit" then
-            M.bindgroup = "commit"
-            changed = true
-        end
+        M.bindgroup = binds
+        binds = M.binds[binds]
 
-    elseif binds == M.binds.branch_view then
-        if  M.bindgroup ~= "branch" then
-            M.bindgroup = "branch"
-            changed = true
-        end
-    elseif binds == M.binds.push_view then
-        if  M.bindgroup ~= "push" then
-            M.bindgroup = "push"
-            changed = true
-        end
-    end
 
-    if changed then
         for map, mode in pairs(M.current_binds) do
             vim.keymap.del(mode, map, {buffer=M.buf})
         end
@@ -78,42 +59,24 @@ M.set_binds = function (binds)
                 vim.keymap.set(map.mode, map.map, map.action, {buffer = M.buf})
             else
                 vim.keymap.set(map.mode, map.map, function ()
-                    local nested = map.nested or nil
-                    local args = map.args or nil
-                    local after = map.after or nil
-                    local after_args = map.after_args or nil
-                    local line = map.line or false
-
-                    if nested then
-                        map.callback(nested, args, after, after_args, line)
-                    end
-
+                    map.callback(map)
                 end, {buffer = M.buf})
                 M.current_binds[map.map] = map.mode
             end
         end
+        return true
     end
-    return M.is_active_repo
+    return false
 end
 
-M.set_always_binds = function ()
-    for _, map in ipairs(M.binds.always) do
+M.set_always_binds = function (key)
+    key = key or "always"
+    for _, map in ipairs(M.binds[key]) do
         if map.action then
             vim.keymap.set(map.mode, map.map, map.action, {buffer = M.buf})
         else
             vim.keymap.set(map.mode, map.map, function ()
-                local nested = map.nested or nil
-                local args = map.args or nil
-                local after = map.after or nil
-                local after_args = map.after_args or nil
-                local line = map.line or false
-
-                if nested then
-                    map.callback(nested, args, after, after_args, line)
-                else
-                    map.callback()
-                end
-
+                map.callback(map)
             end, {buffer = M.buf})
             M.always_binds[map.map] = map.mode
         end
@@ -126,6 +89,69 @@ M.quit = function ()
     end
     vim.cmd("quit")
 end
+
+
+
+M.binds = {
+    ["commit_view"] = {
+        { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, args={git_cmd = "Git commit -m "}},
+        { mode = "n", map = "<UP>",   callback = M.eval_bind, nested = CommitView.next_cached },
+        { mode = "n", map = "<DOWN>", callback = M.eval_bind, nested = CommitView.prev_cached },
+
+    },
+    ["remote_add_view"] = {
+        { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, args={git_cmd = ""}},
+    },
+    ["branch_view"] = {
+        { mode = "n", map = "r", action = "<Nop>" },
+        { mode = "n", map = "r", callback = M.eval_bind, nested = BranchView.rename },
+
+        { mode = "n", map = "o", action = "<Nop>" },
+        { mode = "n", map = "o", callback = M.eval_bind, nested = BranchView.add },
+
+        { mode = "n", map = "<C-d>", action = "<Nop>" },
+        { mode = "n", map = "<C-d>", callback = M.eval_bind, nested = BranchView.delete, after = Git.switch, args={file = true}},
+
+        { mode = "n", map = "<CR>", callback = M.eval_bind, nested = BranchView.switch, after = Git.switch,   args={file = true} },
+
+    },
+    ["defaults"] = {
+        { mode = "n", map = "u",     action = "<Nop>" },
+        { mode = "n", map = "u",     callback = M.eval_bind, nested = Git.untrack_file, after = Git.show_status, args={file = true} },
+        { mode = "n", map = "<C-u>", callback = M.eval_bind, nested = Git.untrack_all,  after = Git.show_status, args={file = true} },
+
+        { mode = "n", map = "a",     action = "<Nop>" },
+        { mode = "n", map = "a",     callback = M.eval_bind, nested = Git.add_file,     after = Git.show_status, args={file = true} },
+        { mode = "n", map = "<C-a>", callback = M.eval_bind, nested = Git.add_all,      after = Git.show_status, args={file = true} },
+
+
+        { mode = "n", map = "p",     action = "<Nop>" },
+        { mode = "n", map = "p",     callback = M.eval_bind, nested = Git.push },
+
+        { mode = "n", map = "<C-p>r",     action = "<Nop>" },
+        { mode = "n", map = "<C-p>r",     callback = M.eval_bind, nested = Git.remote_add },
+    },
+    ["init"] = {
+        { mode = "n", map = "i", action = "<Nop>" },
+        { mode = "n", map = "i", callback = M.eval_bind, nested = Git.status, after = M.add_binds },
+    },
+    ["always"] = {
+        { mode = "n", map = "S",     action = "<Nop>"},
+        { mode = "n", map = "S",     callback = M.eval_bind, nested = Git.switch, new_binds = "branch_view"},
+
+        { mode = "n", map = "s",     action = "<Nop>" },
+        { mode = "n", map = "s",     callback = M.eval_bind, nested = Git.status, new_binds = "defaults" },
+
+        { mode = "n", map = "<C-c>", action = "<Nop>" },
+        { mode = "n", map = "<C-c>", callback = M.eval_bind, nested = Git.commit_all, new_binds = "commit_view" },
+
+        { mode = "n", map = "q", action = "<Nop>" },
+        { mode = "n", map = "q", callback = M.quit },
+
+        { mode = "n", map = "<Esc>", action = "<Nop>" },
+        { mode = "n", map = "<Esc>", callback = M.quit },
+    }
+}
 
 
 return M

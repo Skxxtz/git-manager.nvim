@@ -1,7 +1,8 @@
 local Helpers = require("utils.init")
 
-local Binds = require("binds")
 local Git = require("git")
+Git.setup()
+local Binds = require("binds")
 
 local A = {}
 local M = {}
@@ -38,7 +39,7 @@ M.show_menu = function (opts)
 
     Binds.set_always_binds()
 
-    if Binds.set_binds(Binds.binds.defaults) then
+    if Binds.set_binds("defaults") then
         Git.show_status()
     end
 end
