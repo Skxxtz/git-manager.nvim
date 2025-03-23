@@ -108,7 +108,7 @@ M.binds = {
 
     },
     ["remote_add_view"] = {
-        { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, args={git_cmd = ""}, new_binds = "defaults"},
+        { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, new_binds = "defaults"},
     },
     ["branch_view"] = {
         { mode = "n", map = "r", action = "<Nop>" },
@@ -137,7 +137,7 @@ M.binds = {
         { mode = "n", map = "p",     callback = M.eval_bind, nested = Git.push },
 
         { mode = "n", map = "<C-p>r",     action = "<Nop>" },
-        { mode = "n", map = "<C-p>r",     callback = M.eval_bind, nested = Git.remote_add },
+        { mode = "n", map = "<C-p>r",     callback = M.eval_bind, nested = Git.remote_add, new_binds = "remote_add_view"},
     },
     ["init"] = {
         { mode = "n", map = "i", action = "<Nop>" },
