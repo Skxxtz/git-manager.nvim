@@ -132,7 +132,7 @@ M.merge = function ()
         end
     end
     if active_branch and active_branch ~= line then
-        print("Merge " .. active_branch " to " .. line)
+        print("Merge " .. active_branch .. " to " .. line)
     end
 end
 M.get_branches = function()
