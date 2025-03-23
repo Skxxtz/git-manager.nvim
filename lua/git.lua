@@ -174,8 +174,6 @@ Binds.binds = {
         { mode = "n", map = "a",     callback = Binds.status_op, nested = M.add_file,     after = M.show_status, line = true },
         { mode = "n", map = "<C-a>", callback = Binds.status_op, nested = M.add_all,      after = M.show_status, line = true },
 
-        { mode = "n", map = "<C-c>", action = "<Nop>" },
-        { mode = "n", map = "<C-c>", callback = Binds.status_op, nested = M.commit_all },
 
         { mode = "n", map = "p",     action = "<Nop>" },
         { mode = "n", map = "p",     callback = Binds.status_op, nested = M.push },
@@ -186,6 +184,9 @@ Binds.binds = {
 
         { mode = "n", map = "s",     action = "<Nop>" },
         { mode = "n", map = "s",     callback = Binds.status_op, nested = M.status },
+
+        { mode = "n", map = "<C-c>", action = "<Nop>" },
+        { mode = "n", map = "<C-c>", callback = Binds.status_op, nested = M.commit_all },
     },
     init = {
         { mode = "n", map = "i", action = "<Nop>" },
