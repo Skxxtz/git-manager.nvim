@@ -9,11 +9,11 @@ end
 --------------------
 -- Init
 --------------------
-M.init = function()
+M.init = function(_)
     local result = Helper.execute_shell("git init")
     return result
 end
-M.check_if_repo = function()
+M.check_if_repo = function(_)
     local result = Helper.execute_shell("git rev-parse --is-inside-work-tree")
     if result then
         return result:match("^true") ~= nil
@@ -25,7 +25,7 @@ end
 --------------------
 -- Status
 --------------------
-M.status = function()
+M.status = function(_)
     local result = Helper.execute_shell("git status")
     if result and #result > 0 then
         result = result:gsub("%s*%b()", "")
@@ -33,7 +33,7 @@ M.status = function()
     M.last_cmd = M.status
     return result
 end
-M.show_status = function()
+M.show_status = function(_)
     local r = M.status()
     Helper.print_to_buffer(r)
 end
@@ -42,9 +42,10 @@ end
 --------------------
 -- Adding
 --------------------
-M.add_file = function(file)
-    if file then
-        local result = Helper.execute_shell("git add " .. file)
+M.add_file = function(args)
+    args = args or {}
+    if args.file then
+        local result = Helper.execute_shell("git add " .. args.file)
         if #result > 0 then
             M.last_cmd = M.add_file
         else
@@ -56,7 +57,7 @@ M.add_file = function(file)
     end
     return false
 end
-M.add_all = function()
+M.add_all = function(_)
     local result = Helper.execute_shell("git add .")
     if #result > 0 then
         M.last_cmd = M.add_all
@@ -72,7 +73,7 @@ end
 --------------------
 -- Committing
 --------------------
-M.commit_all = function()
+M.commit_all = function(_)
     CommitView.show({prompt = "Commit Message:"})
 end
 
@@ -80,28 +81,29 @@ end
 --------------------
 -- Pushing
 --------------------
-M.push = function()
+M.push = function(_)
     local result = Helper.execute_shell("git push", true)
     return result
 end
 
-M.remote_add = function()
+M.remote_add = function(_)
     CommitView.show({prompt = "Remote URL:", git_cmd = "git remote add %s"})
 end
 
 --------------------
 -- Untracking
 --------------------
-M.untrack_file = function(file)
-    if file then
-        local result = Helper.execute_shell("git reset " .. file)
+M.untrack_file = function(args)
+    args = args or {}
+    if args.file then
+        local result = Helper.execute_shell("git reset " .. args.file)
         if result and string.find(result, "error") then
             return result
         end
     end
     return false
 end
-M.untrack_all = function()
+M.untrack_all = function(_)
     local result = Helper.execute_shell("git reset")
     if #result > 0 then
         M.last_cmd = M.untrack_all
@@ -117,12 +119,14 @@ end
 --------------------
 -- Switch
 --------------------
-M.switch = function()
+M.branches = function(_)
     local branches = M.get_branches()
     Helper.print_to_buffer(branches)
 end
-M.branch_action = function (git_cmd)
-    git_cmd = git_cmd or "git merge %s"
+M.branch_action = function (args)
+    args = args or {
+        git_cmd = "git merge %s"
+    }
     local lines = vim.api.nvim_buf_get_lines(Helper.buf, 0, -1, false)
     local _, line = vim.api.nvim_get_current_line():match("(%**)%s*(.*)")
     local active_branch = nil
@@ -133,12 +137,12 @@ M.branch_action = function (git_cmd)
         end
     end
     if active_branch and active_branch ~= line then
-        local cmd = string.format(git_cmd, line)
+        local cmd = string.format(args.git_cmd, line)
         return Helper.execute_shell(cmd)
     end
     return false
 end
-M.get_branches = function()
+M.get_branches = function(_)
     local branches_raw = Helper.execute_shell("git branch")
     if branches_raw then
         branches_raw = vim.fn.split(branches_raw, "\n")
