@@ -68,7 +68,8 @@ M.add = function ()
             if #line == 2 then
                 vim.api.nvim_buf_set_lines(Helper.buf, M.cursor_position[1]-1, M.cursor_position[1], false, {})
             else
-                print("Line added: " .. line)
+                line = Helper.trim(line)
+                Helper.execute_shell("git branch " .. line)
             end
         end
     })
