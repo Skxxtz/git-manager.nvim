@@ -127,9 +127,14 @@ M.switch = function()
         vim.cmd("mapclear <buffer>")
         local line = vim.api.nvim_get_current_line()
         local _, branch_name = line:match("(%**)%s*(.*)")
-        Helper.execute_shell("git switch " .. branch_name)
-        Helper.print_to_buffer(M.switch())
-        M.add_normal_binds()
+        local r = Helper.execute_shell("git switch " .. branch_name, true)
+        if r then
+            if string.find(r, "Switched") then
+                Helper.print_to_buffer(M.switch())
+            elseif string.find(r, "error:") then
+                Helper.print_to_buffer(r)
+            end
+        end
     end, { buffer = Helper.buf })
 end
 M.get_branches = function()
