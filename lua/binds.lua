@@ -117,6 +117,9 @@ M.binds = {
         { mode = "n", map = "o", action = "<Nop>" },
         { mode = "n", map = "o", callback = M.eval_bind, nested = BranchView.add },
 
+        { mode = "n", map = "m", action = "<Nop>" },
+        { mode = "n", map = "m", callback = M.eval_bind, nested = Git.merge },
+
         { mode = "n", map = "<C-d>", action = "<Nop>" },
         { mode = "n", map = "<C-d>", callback = M.eval_bind, nested = BranchView.delete, after = Git.switch, args={line = true}},
 
