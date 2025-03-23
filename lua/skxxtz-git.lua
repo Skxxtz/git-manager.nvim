@@ -29,10 +29,12 @@ M.show_menu = function (opts)
 
     vim.api.nvim_create_augroup("BranchAu", {clear = false})
 
-    Helpers.ns_id = vim.api.nvim_create_namespace("MyHighlight")
-    vim.cmd("highlight MyHighlight guibg=Yellow guifg=Black")
+    Helpers.ns_id = vim.api.nvim_create_namespace("skxxtz-git")
+    vim.api.nvim_set_hl(Helpers.ns_id, "YellowBg", { bg = "Yellow", fg = "Black" })
 
     vim.wo[M.win].foldmethod = "manual"
+
+    vim.api.nvim_buf_set_name(M.buf, "Git")
 
     Helpers.win = M.win
     Helpers.buf = M.buf
