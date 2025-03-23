@@ -79,62 +79,7 @@ local function branch_regex()
         "unstable/release-v0.1.5",
     }
     for i, line in ipairs(lines) do
-        local star, branch_name = line:match("(%**)%s*(.*)")
-        assert(branch_name == should_be[i])
-
-        print("Passed: " .. branch_name)
-    end
-    print("\n\n")
-end
-
-
-local function error_regex_test()
-    print("ERROR REGEX TEST:")
-    local lines = {
-        "error: Your local changes to the following files would be overwritten by checkout:\n	lua/git.lua\n	lua/utils/init.lua\n	lua/views/branch.lua\nPlease commit your changes or stash them before you switch branches.\nAborting",
-        "error: something went wrong, Switched to branch 'main'"
-    }
-    local should_be = {
-        "/home/user/documents/file.txt",
-        "documents/file.txt",
-        "../file.txt",
-        "./file.txt",
-        "~/documents/file.txt",
-        "/home/user/my documents/file.txt",
-        "./lua",
-        "./",
-        "lua/",
-        "lua/",
-        "lua/git.lua",
-        "lua/git.lua",
-        "lua/skxxtz-git.lua"
-    }
-    for i, line in ipairs(lines) do  -- Use ipairs to iterate through the array
-        print(string.find(line, "Switched"))
-    end
-    print("\n\n")
-end
-
-local function branch_regex()
-    print("BRANCH REGEX TEST:")
-    local lines = {
-        "  feature/caching",
-        "  main",
-        "  stable/release-v0.1.2",
-        "  stable/release-v0.1.3",
-        "  stable/release-v0.1.4",
-        "* unstable/release-v0.1.5",
-    }
-    local should_be = {
-        "feature/caching",
-        "main",
-        "stable/release-v0.1.2",
-        "stable/release-v0.1.3",
-        "stable/release-v0.1.4",
-        "unstable/release-v0.1.5",
-    }
-    for i, line in ipairs(lines) do
-        local star, branch_name = line:match("(%**)%s*(.*)")
+        local _, branch_name = line:match("(%**)%s*(.*)")
         assert(branch_name == should_be[i])
 
         print("Passed: " .. branch_name)
@@ -145,6 +90,5 @@ end
 
 
 status_note_regex()
-error_regex_test()
 file_regex()
 branch_regex()
