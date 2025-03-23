@@ -17,7 +17,7 @@ M.show = function (opts)
     Helper.lock_line({lower = #M.prompt, upper = nil}, {lower = nil, upper = nil})
 end
 
-M.accept = function ()
+M.accept = function (_)
     local prompt = M.prompt or "Commit Message:"
     local lines = vim.api.nvim_buf_get_lines(Helper.buf, 0, -1, false)
     local message_lines = {}
@@ -34,14 +34,14 @@ M.accept = function ()
     local cmd = string.format(M.cmd, message)
     Helper.execute_shell(cmd)
 end
-M.next_cached = function ()
+M.next_cached = function (_)
     M.counter = M.counter + 1
     local m = M.last_commit_message[#M.last_commit_message - M.counter]
     if m then
         vim.api.nvim_buf_set_lines(Helper.buf, 1, -1, false, vim.fn.split(m, "\n"))
     end
 end
-M.prev_cached = function ()
+M.prev_cached = function (_)
     M.counter = M.counter - 1
     local m = M.last_commit_message[#M.last_commit_message - M.counter]
     if m then
