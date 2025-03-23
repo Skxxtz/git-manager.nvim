@@ -48,8 +48,8 @@ M.add = function (args)
     vim.api.nvim_clear_autocmds({group = 'BranchAu'})
 
     local row, _ = unpack(vim.api.nvim_win_get_cursor(Helper.win))
-
-    vim.api.nvim_buf_set_lines(Helper.buf, row, row, true, {"  "})
+    local row_start = args.content or "  "
+    vim.api.nvim_buf_set_lines(Helper.buf, row, row, true, {row_start})
 
     M.cursor_position = {row + 1, 2}
     M.num_lines = vim.api.nvim_buf_line_count(Helper.buf)
