@@ -127,7 +127,7 @@ M.branch_action = function (git_cmd)
     local _, line = vim.api.nvim_get_current_line():match("(%**)%s*(.*)")
     local active_branch = nil
     for _, l in ipairs(lines) do
-        local active, branch_name = l:match("(%**)%s*(.*)")
+        local active, branch_name = l:match("%s*(%*)%s*(.*)")
         if active then
             active_branch = branch_name
         end
