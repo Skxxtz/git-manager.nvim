@@ -132,7 +132,8 @@ M.merge = function ()
         end
     end
     if active_branch and active_branch ~= line then
-        print("Merge " .. active_branch .. " to " .. line)
+        local cmd = string.format("git merge --rebase %s", line)
+        Helper.execute_shell(cmd)
     end
 end
 M.get_branches = function()
