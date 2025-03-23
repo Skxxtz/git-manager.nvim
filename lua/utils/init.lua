@@ -11,7 +11,7 @@ M.print_to_buffer = function (line, buffer, highlights)
     buffer = buffer or M.buf
     highlights = highlights or {
         ["error:"] = "ErrorMsg",
-        ["fatal"] = "ErrorMsg",
+        ["fatal:"] = "ErrorMsg",
     }
     if line then
         if type(line) == "string" then
