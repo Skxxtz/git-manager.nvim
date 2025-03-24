@@ -33,6 +33,7 @@ M.accept = function (_)
     local message = table.concat(message_lines, "\n")
     table.insert(M.last_commit_message, message)
     local cmd = string.format(M.cmd, message)
+    print(vim.inspect(cmd))
     Helper.execute_shell(cmd)
 end
 M.next_cached = function (_)

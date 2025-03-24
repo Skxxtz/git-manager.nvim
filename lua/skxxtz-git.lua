@@ -44,6 +44,7 @@ M.show_menu = function (opts)
     if Binds.set_binds("defaults") then
         Git.show_status()
     end
+
 end
 
 vim.keymap.set("n", "<leader>ga", function ()
