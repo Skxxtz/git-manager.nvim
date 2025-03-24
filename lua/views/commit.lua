@@ -7,12 +7,13 @@ local M = {
 M.show = function (opts)
     opts = opts or {}
     local tmp = opts.prompt or ""
+    local line_start = opts.content or ""
     M.prompt = vim.fn.split(tmp, "\n")
     M.cmd = opts.git_cmd or 'git commit -m "%s"'
 
     vim.api.nvim_buf_set_lines(Helper.buf, 0, -1, false, M.prompt)
-    vim.api.nvim_buf_set_lines(Helper.buf, #M.prompt, #M.prompt, false, {""})
-    vim.api.nvim_win_set_cursor(Helper.win, { #M.prompt + 1, 0 })
+    vim.api.nvim_buf_set_lines(Helper.buf, #M.prompt, #M.prompt, false, {line_start})
+    vim.api.nvim_win_set_cursor(Helper.win, { #M.prompt + 1, #line_start })
 
     Helper.lock_line({lower = #M.prompt, upper = nil}, {lower = nil, upper = nil})
 end

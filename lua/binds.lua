@@ -18,9 +18,12 @@ M.eval_bind = function(map)
 
     if map.args and map.args.line then
         local file = Helper.get_file_under_cursor()
-        result = map.nested(file)
-    elseif map.args and map.args.git_cmd then
-        result = map.nested(map.args.git_cmd)
+        if file then
+            map.args.file = file
+        end
+        result = map.nested(map.args)
+    elseif map.args then
+        result = map.nested(map.args)
     else
         result = map.nested()
     end
@@ -106,6 +109,10 @@ M.binds = {
         { mode = "n", map = "<UP>",   callback = M.eval_bind, nested = CommitView.next_cached },
         { mode = "n", map = "<DOWN>", callback = M.eval_bind, nested = CommitView.prev_cached },
 
+        { mode = "n", map = "<C-f>", action = "<Nop>" },
+        { mode = "n", map = "<C-f>", callback = M.eval_bind, nested = CommitView.show, args={line = true, content = "[frontend] ", prompt = "Commit Message:"}},
+        { mode = "n", map = "<C-b>", action = "<Nop>" },
+        { mode = "n", map = "<C-b>", callback = M.eval_bind, nested = CommitView.show, args={line = true, content = "[backend] ", prompt = "Commit Message:"}},
     },
     ["remote_add_view"] = {
         { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, new_binds = "defaults"},
@@ -124,10 +131,9 @@ M.binds = {
         { mode = "n", map = "rb", callback = M.eval_bind, nested = Git.branch_action, args = {git_cmd = "git rebase %s"}},
 
         { mode = "n", map = "<C-d>", action = "<Nop>" },
-        { mode = "n", map = "<C-d>", callback = M.eval_bind, nested = BranchView.delete, after = Git.switch, args={line = true}},
+        { mode = "n", map = "<C-d>", callback = M.eval_bind, nested = BranchView.delete, after = Git.branches, args={line = true}},
 
-        { mode = "n", map = "<CR>", callback = M.eval_bind, nested = BranchView.switch, after = Git.switch,   args={line = true} },
-
+        { mode = "n", map = "<CR>", callback = M.eval_bind, nested = BranchView.switch, after = Git.branches,   args={line = true} },
     },
     ["defaults"] = {
         { mode = "n", map = "u",     action = "<Nop>" },
@@ -151,7 +157,7 @@ M.binds = {
     },
     ["always"] = {
         { mode = "n", map = "S",     action = "<Nop>"},
-        { mode = "n", map = "S",     callback = M.eval_bind, nested = Git.switch, new_binds = "branch_view"},
+        { mode = "n", map = "S",     callback = M.eval_bind, nested = Git.branches, new_binds = "branch_view"},
 
         { mode = "n", map = "s",     action = "<Nop>" },
         { mode = "n", map = "s",     callback = M.eval_bind, nested = Git.status, new_binds = "defaults" },
