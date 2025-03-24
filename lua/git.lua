@@ -121,7 +121,30 @@ end
 --------------------
 M.branches = function(_)
     local branches = M.get_branches()
-    Helper.print_to_buffer(branches)
+    local lines = {}
+    for branch, props in pairs(branches) do
+        table.insert(lines, string.format("%-2s%s", props.raw_active, branch))
+    end
+    Helper.print_to_buffer(lines)
+    -- vim.api.nvim_create_autocmd({"CursorMoved", "CursorMovedI"}, {
+    --     buffer = Helper.buf,
+    --     group = "BranchAu",
+    --     callback = function ()
+    --         local branch_info = Helper.get_branch_under_cursor()
+    --         local upstream = ""
+    --         if branch_info.name then
+    --             local r = Helper.execute_shell("git rev-parse --abbrev-ref --symbolic-full-name @{upstream}")
+    --             if r then
+    --                 if not string.find("fatal", r) then
+    --                     r = Helper.trim(r)
+    --                     print(vim.inspect(r))
+    --                     upstream = branch_info.raw_line .. "     " .. r
+    --                 end
+    --             end
+    --             vim.api.nvim_set_current_line(upstream)
+    --         end
+    --     end
+    -- })
 end
 M.branch_action = function (args)
     args = args or {
@@ -143,11 +166,17 @@ M.branch_action = function (args)
     return false
 end
 M.get_branches = function(_)
-    local branches_raw = Helper.execute_shell("git branch")
+    local branches_raw = Helper.execute_shell('git for-each-ref --format="%(HEAD) %(refname:short) %(upstream:short)" refs/heads')
+    local branches = {}
     if branches_raw then
         branches_raw = vim.fn.split(branches_raw, "\n")
-        return branches_raw
+        for _, branch in ipairs(branches_raw) do
+            print(branch)
+            local active, name, upstream  = branch:match("(%**)%s*(%S+)%s*(%S*)%c?$")
+            branches[name] = {is_active = (active == "*"), upstream = upstream, raw_active = active or "",}
+        end
     end
+    return branches
 end
 
 

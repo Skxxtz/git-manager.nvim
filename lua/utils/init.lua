@@ -8,6 +8,14 @@ M.get_file_under_cursor = function ()
     local match = line:match(".-([%w]*[%.%/%~]+[%w%s]*[%w%/%s]*[%.%w%-%_]*)")
     return match
 end
+M.get_branch_under_cursor = function ()
+    local line = vim.api.nvim_get_current_line()
+    local active, branch = line:match("%s*(%**)%s*(.*)")
+    if active then
+        active = true
+    end
+    return {name = branch, active = active or false, raw_line = line}
+end
 
 M.lock_line = function (row_bound, col_bound, fixed_lines)
     local row, col = unpack(vim.api.nvim_win_get_cursor(M.win))
@@ -80,7 +88,7 @@ end
 
 M.trim = function (string)
     if string then
-        return string:match("%s*(.*)%s*")
+        return string:match("^%s*(.-)%s*$")
     end
     return ""
 end

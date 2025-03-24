@@ -89,7 +89,22 @@ local function branch_regex()
 end
 
 
-
+local function test_advanced_branches()
+    local lines = {
+        "  feature/caching origin/feature/caching",
+        "  main origin/main",
+        "  stable/release-v0.1.2 origin/stable/release-v0.1.2",
+        "  stable/release-v0.1.3 origin/stable/release-v0.1.3",
+        "  stable/release-v0.1.4 origin/stable/release-v0.1.4",
+        "* unstable/release-v0.1.5 origin/unstable/release-v0.1.5",
+        "* main",
+    }
+    for _, line in ipairs(lines) do
+        local active, name, upstream  = line:match("(%**)%s*(%S+)%s*(%S*)%c?$")
+        print(active, name, upstream)
+    end
+end
 status_note_regex()
 file_regex()
 branch_regex()
+test_advanced_branches()
