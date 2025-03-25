@@ -53,8 +53,8 @@ end
 M.print_to_buffer = function (line, buffer, highlights)
     buffer = buffer or M.buf
     highlights = highlights or {
-        ["error:"] = "ErrorMsg",
-        ["fatal:"] = "ErrorMsg",
+        ["error:"] = "Error",
+        ["fatal:"] = "Error",
     }
     if line then
         if type(line) == "string" then
@@ -72,18 +72,25 @@ M.print_to_buffer = function (line, buffer, highlights)
     end
 end
 
-M.execute_shell = function (command, show)
-    local loc = " 2> /dev/null"
-    if show then
-        loc = " 2>&1"
-    end
+M.execute_shell = function(command)
+    local loc = " 2>&1; echo $?"
     local handle = io.popen(command .. loc)
-    if handle then
-        local result = handle:read("*a")
-        handle:close()
-        return result
+
+    if not handle then return nil, "Failed to execute command" end
+
+    local result = handle:read("*a")
+    handle:close()
+
+    -- Extract exit code (last line of output)
+    local output_lines = {}
+    for line in result:gmatch("[^\r\n]+") do
+        table.insert(output_lines, line)
     end
-    return nil
+
+    local exit_code = tonumber(output_lines[#output_lines]) -- Last line is the exit code
+    table.remove(output_lines) -- Remove exit code from output
+    local command_output = table.concat(output_lines, "\n")
+    return command_output, exit_code
 end
 
 M.trim = function (string)
