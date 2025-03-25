@@ -1,4 +1,5 @@
 local CommitView = require("views.commit")
+local Messages = require("messages")
 local Helper = require("utils.init")
 
 local M = {}
@@ -58,15 +59,7 @@ M.add_file = function(args)
     return false
 end
 M.add_all = function(_)
-    local result = Helper.execute_shell("git add .")
-    if #result > 0 then
-        M.last_cmd = M.add_all
-    else
-        if M.last_cmd == M.status then
-            result = M.last_cmd()
-        end
-    end
-    return result
+    Helper.execute_shell("git add .")
 end
 
 
@@ -96,37 +89,40 @@ end
 M.untrack_file = function(args)
     args = args or {}
     if args.file then
-        local result = Helper.execute_shell("git reset " .. args.file)
-        if result and string.find(result, "error") then
+        local result, exit_code = Helper.execute_shell("git reset " .. args.file)
+        if exit_code ~= 0 then
             return result
         end
     end
     return false
 end
 M.untrack_all = function(_)
-    local result = Helper.execute_shell("git reset")
-    if #result > 0 then
-        M.last_cmd = M.untrack_all
-    else
-        if M.last_cmd == M.status then
-            result = M.last_cmd()
-        end
+    local result, exit_code = Helper.execute_shell("git reset")
+    if exit_code ~= 0 then
+        return result
     end
-    return result
+    return false
 end
 
 
 --------------------
 -- Branching
 --------------------
-M.branches = function(_)
+M.branch = function(_)
     local branches = M.get_branches()
     local lines = {}
+    local upstream_lines = {}
     for branch, props in pairs(branches) do
-        local upstream_set = not props.upstream and "x" or ""
-        table.insert(lines, string.format("%-2s%-2s%s", props.raw_active, upstream_set, branch))
+        if props.upstream == "" then
+            table.insert(upstream_lines, #lines)
+        end
+        table.insert(lines, string.format("%-2s%s", props.raw_active, branch))
     end
     Helper.print_to_buffer(lines)
+
+    for _, index in ipairs(upstream_lines) do
+        vim.api.nvim_buf_add_highlight(Helper.buf, Helper.ns_id, "Warning", index, 2, -1  )
+    end
 end
 M.branch_action = function (args)
     args = args or {
@@ -153,13 +149,47 @@ M.get_branches = function(_)
     if branches_raw then
         branches_raw = vim.fn.split(branches_raw, "\n")
         for _, branch in ipairs(branches_raw) do
-            print(branch)
-            local active, name, upstream  = branch:match("(%**)%s*(%S+)%s*(%S*)%c?$")
+            local active, name, upstream  = branch:match("(%**)%s+(%S+)%s*(%S*)%c?$")
             branches[name] = {is_active = (active == "*"), upstream = upstream, raw_active = active or "",}
         end
     end
+    M.branches = branches
     return branches
 end
+M.create_branch_on_remote = function(_)
+    local remote, _= Helper.execute_shell("git remote")
+
+    if remote ~= "" then
+        local line = vim.api.nvim_get_current_line()
+        local _, branch_name = line:match("%s*(%**)%s+(%S*)")
+        local branch = M.branches[branch_name]
+        if branch then
+            local cmd = "git push " .. remote .. " %s"
+            local prompt = string.format('Add Branch to "%s":', remote)
+            CommitView.show({prompt = prompt, content = branch_name, git_cmd = cmd})
+        end
+    else
+        return Messages.no_remote_set
+    end
+end
+M.set_upstream_branch = function(_)
+    local remote, _= Helper.execute_shell("git remote")
+
+    if remote ~= "" then
+        local line = vim.api.nvim_get_current_line()
+        local _, branch_name = line:match("%s*(%**)%s+(%S*)")
+        local branch = M.branches[branch_name]
+        if branch then
+            local content = branch.upstream
+            if branch.upstream == "" then
+                content = string.format("%s/%s", remote, branch_name)
+            end
+            local cmd = "git branch -u %s " .. branch_name
+            CommitView.show({prompt = "Branch Upstream:", content = content, git_cmd = cmd})
+        end
+    end
+end
+
 
 
 return M
