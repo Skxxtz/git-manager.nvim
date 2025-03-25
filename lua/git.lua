@@ -117,34 +117,16 @@ end
 
 
 --------------------
--- Switch
+-- Branching
 --------------------
 M.branches = function(_)
     local branches = M.get_branches()
     local lines = {}
     for branch, props in pairs(branches) do
-        table.insert(lines, string.format("%-2s%s", props.raw_active, branch))
+        local upstream_set = not props.upstream and "x" or ""
+        table.insert(lines, string.format("%-2s%-2s%s", props.raw_active, upstream_set, branch))
     end
     Helper.print_to_buffer(lines)
-    -- vim.api.nvim_create_autocmd({"CursorMoved", "CursorMovedI"}, {
-    --     buffer = Helper.buf,
-    --     group = "BranchAu",
-    --     callback = function ()
-    --         local branch_info = Helper.get_branch_under_cursor()
-    --         local upstream = ""
-    --         if branch_info.name then
-    --             local r = Helper.execute_shell("git rev-parse --abbrev-ref --symbolic-full-name @{upstream}")
-    --             if r then
-    --                 if not string.find("fatal", r) then
-    --                     r = Helper.trim(r)
-    --                     print(vim.inspect(r))
-    --                     upstream = branch_info.raw_line .. "     " .. r
-    --                 end
-    --             end
-    --             vim.api.nvim_set_current_line(upstream)
-    --         end
-    --     end
-    -- })
 end
 M.branch_action = function (args)
     args = args or {

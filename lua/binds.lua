@@ -41,13 +41,13 @@ end
 
 M.set_binds = function (binds)
     if binds and binds ~= M.bindgroup then
+        M.bindgroup = binds
         if not Git.is_active_repo then
             binds = M.binds.init
             Helper.print_to_buffer(Messages.is_no_repo)
+        else
+            binds = M.binds[binds]
         end
-        M.bindgroup = binds
-        binds = M.binds[binds]
-
 
         for map, mode in pairs(M.current_binds) do
             vim.keymap.del(mode, map, {buffer=Helper.buf})
@@ -64,7 +64,7 @@ M.set_binds = function (binds)
                 M.current_binds[map.map] = map.mode
             end
         end
-        return true
+        return Git.is_active_repo
     end
     return false
 end
