@@ -117,6 +117,9 @@ M.binds = {
     ["remote_add_view"] = {
         { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.show_status, new_binds = "defaults"},
     },
+    ["set_branch_upstream"] = {
+        { mode = "n", map = "<C-CR>", callback = M.eval_bind, nested = CommitView.accept, after = Git.branch, new_binds = "branch_view"},
+    },
     ["branch_view"] = {
         { mode = "n", map = "rn", action = "<Nop>" },
         { mode = "n", map = "rn", callback = M.eval_bind, nested = BranchView.rename },
@@ -127,13 +130,19 @@ M.binds = {
         { mode = "n", map = "m", action = "<Nop>" },
         { mode = "n", map = "m", callback = M.eval_bind, nested = Git.branch_action, args = {git_cmd = "git merge %"}},
 
+        { mode = "n", map = "bp", action = "<Nop>" },
+        { mode = "n", map = "bp", callback = M.eval_bind, nested = Git.create_branch_on_remote, new_binds = "set_branch_upstream"},
+
+        { mode = "n", map = "u", action = "<Nop>" },
+        { mode = "n", map = "u", callback = M.eval_bind, nested = Git.set_upstream_branch, new_binds="set_branch_upstream"},
+
         { mode = "n", map = "rb", action = "<Nop>" },
         { mode = "n", map = "rb", callback = M.eval_bind, nested = Git.branch_action, args = {git_cmd = "git rebase %s"}},
 
         { mode = "n", map = "<C-d>", action = "<Nop>" },
-        { mode = "n", map = "<C-d>", callback = M.eval_bind, nested = BranchView.delete, after = Git.branches, args={line = true}},
+        { mode = "n", map = "<C-d>", callback = M.eval_bind, nested = BranchView.delete, after = Git.branch, args={line = true}},
 
-        { mode = "n", map = "<CR>", callback = M.eval_bind, nested = BranchView.switch, after = Git.branches,   args={line = true} },
+        { mode = "n", map = "<CR>", callback = M.eval_bind, nested = BranchView.switch, after = Git.branch,   args={line = true} },
     },
     ["defaults"] = {
         { mode = "n", map = "u",     action = "<Nop>" },
@@ -146,7 +155,7 @@ M.binds = {
 
 
         { mode = "n", map = "p",     action = "<Nop>" },
-        { mode = "n", map = "p",     callback = M.eval_bind, nested = Git.push },
+        { mode = "n", map = "p",     callback = M.eval_bind, nested = Git.push, after = Git.status},
 
         { mode = "n", map = "<C-p>r",     action = "<Nop>" },
         { mode = "n", map = "<C-p>r",     callback = M.eval_bind, nested = Git.remote_add, new_binds = "remote_add_view"},
@@ -157,7 +166,7 @@ M.binds = {
     },
     ["always"] = {
         { mode = "n", map = "S",     action = "<Nop>"},
-        { mode = "n", map = "S",     callback = M.eval_bind, nested = Git.branches, new_binds = "branch_view"},
+        { mode = "n", map = "S",     callback = M.eval_bind, nested = Git.branch, new_binds = "branch_view"},
 
         { mode = "n", map = "s",     action = "<Nop>" },
         { mode = "n", map = "s",     callback = M.eval_bind, nested = Git.status, new_binds = "defaults" },
