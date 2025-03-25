@@ -2,7 +2,7 @@ local Helper = require("utils.init")
 
 local M = {
     counter = -1,
-    last_commit_message = {}
+    last_message = {}
 }
 M.show = function (opts)
     opts = opts or {}
@@ -25,26 +25,29 @@ M.accept = function (_)
     if #lines >= #prompt + 1 then
         for i, line in ipairs(lines) do
             if i >= #prompt + 1 then
-                line = line:gsub('"', "'")
+                line = Helper.trim(line:gsub('"', "'"))
                 table.insert(message_lines, line)
             end
         end
     end
     local message = table.concat(message_lines, "\n")
-    table.insert(M.last_commit_message, message)
+    table.insert(M.last_message, message)
     local cmd = string.format(M.cmd, message)
-    Helper.execute_shell(cmd)
+    local result, exit_code = Helper.execute_shell(cmd)
+    if exit_code ~= 0 then
+        return result
+    end
 end
 M.next_cached = function (_)
     M.counter = M.counter + 1
-    local m = M.last_commit_message[#M.last_commit_message - M.counter]
+    local m = M.last_message[#M.last_message - M.counter]
     if m then
         vim.api.nvim_buf_set_lines(Helper.buf, 1, -1, false, vim.fn.split(m, "\n"))
     end
 end
 M.prev_cached = function (_)
     M.counter = M.counter - 1
-    local m = M.last_commit_message[#M.last_commit_message - M.counter]
+    local m = M.last_message[#M.last_message - M.counter]
     if m then
         vim.api.nvim_buf_set_lines(Helper.buf, 1, -1, false, vim.fn.split(m, "\n"))
     else
