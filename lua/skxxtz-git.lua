@@ -30,7 +30,11 @@ M.show_menu = function (opts)
     vim.api.nvim_create_augroup("BranchAu", {clear = false})
 
     Helpers.ns_id = vim.api.nvim_create_namespace("skxxtz-git")
-    vim.api.nvim_set_hl(Helpers.ns_id, "YellowBg", { bg = "Yellow", fg = "Black" })
+    vim.api.nvim_win_set_hl_ns(M.win, Helpers.ns_id)  -- activate the ns group
+
+    vim.api.nvim_set_hl(Helpers.ns_id, "Warning", { fg = "#D5C67A" })
+    vim.api.nvim_set_hl(Helpers.ns_id, "Error", { fg = "#A35655" })
+    vim.api.nvim_set_hl(Helpers.ns_id, "Accent", { fg = "#3E4C5E" })
 
     vim.wo[M.win].foldmethod = "manual"
 
