@@ -128,7 +128,7 @@ M.binds = {
         { mode = "n", map = "o", callback = M.eval_bind, nested = BranchView.add },
 
         { mode = "n", map = "m", action = "<Nop>" },
-        { mode = "n", map = "m", callback = M.eval_bind, nested = Git.branch_action, args = {git_cmd = "git merge %"}},
+        { mode = "n", map = "m", callback = M.eval_bind, nested = Git.branch_action, args = {git_cmd = "git merge %s"}},
 
         { mode = "n", map = "bp", action = "<Nop>" },
         { mode = "n", map = "bp", callback = M.eval_bind, nested = Git.create_branch_on_remote, new_binds = "set_branch_upstream"},
