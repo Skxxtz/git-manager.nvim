@@ -1,3 +1,20 @@
+# Git Manager
+
+This is still under development and isn't fully functional yet. The idea is to make navigation in git repositories faster and more efficient. Currently supported features are:
+
+- Tracking/Untracking files 
+- Switching, creating, renaming branches
+- Setting remotes
+- Setting upstreams
+- Merging
+- Rebasing
+
+Next features will be:
+
+- Forcing commands
+- Deleting upstream branches
+
+
 ## Binds:
 | Mode | Key | Action | 
 | --------------- | --------------- | --------------- | 
