@@ -99,6 +99,7 @@ M.quit = function ()
 
         vim.api.nvim_buf_delete(Helper.buf, {force = true})
         Helper.buf = nil
+        Helper.active = false
     end
 end
 

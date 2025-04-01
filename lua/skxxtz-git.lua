@@ -1,11 +1,13 @@
-local Helpers = require("utils.init")
+local Helper = require("utils.init")
 
 local Git = require("git")
 Git.setup()
 local Binds = require("binds")
 
 local A = {}
-local M = {}
+local M = {
+    active = false
+}
 
 unpack = unpack or table.unpack
 
@@ -24,24 +26,24 @@ M.show_menu = function (opts)
         win = A.win,
     }
 
-    M.buf = Helpers.buf or vim.api.nvim_create_buf(false, true)
+    M.buf = Helper.buf or vim.api.nvim_create_buf(false, true)
     M.win = vim.api.nvim_open_win(M.buf, true, win_config)
 
     vim.api.nvim_create_augroup("BranchAu", {clear = false})
 
-    Helpers.ns_id = vim.api.nvim_create_namespace("skxxtz-git")
-    vim.api.nvim_win_set_hl_ns(M.win, Helpers.ns_id)  -- activate the ns group
+    Helper.ns_id = vim.api.nvim_create_namespace("skxxtz-git")
+    vim.api.nvim_win_set_hl_ns(M.win, Helper.ns_id)  -- activate the ns group
 
-    vim.api.nvim_set_hl(Helpers.ns_id, "Warning", { fg = "#D5C67A" })
-    vim.api.nvim_set_hl(Helpers.ns_id, "Error", { fg = "#A35655" })
-    vim.api.nvim_set_hl(Helpers.ns_id, "Accent", { fg = "#3E4C5E" })
+    vim.api.nvim_set_hl(Helper.ns_id, "Warning", { fg = "#D5C67A" })
+    vim.api.nvim_set_hl(Helper.ns_id, "Error", { fg = "#A35655" })
+    vim.api.nvim_set_hl(Helper.ns_id, "Accent", { fg = "#3E4C5E" })
 
     vim.wo[M.win].foldmethod = "manual"
 
     vim.api.nvim_buf_set_name(M.buf, "Git")
 
-    Helpers.win = M.win
-    Helpers.buf = M.buf
+    Helper.win = M.win
+    Helper.buf = M.buf
 
     Binds.set_always_binds()
 
@@ -52,7 +54,10 @@ M.show_menu = function (opts)
 end
 
 vim.keymap.set("n", "<leader>ga", function ()
-    M.show_menu()
+    if not Helper.active then
+        M.show_menu()
+        Helper.active = true
+    end
 end)
 
 
