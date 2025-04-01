@@ -29,6 +29,7 @@ Next features will be:
 | --------------- | --------------- | --------------- | 
 | Init | `i` | `git init`| 
 <br>
+
 | Mode | Key | Action | 
 | --------------- | --------------- | --------------- | 
 | Status | `u` | Untrack file - `git reset <file>` | 
@@ -38,6 +39,7 @@ Next features will be:
 | Status | `p` | Push to remote - `git push`| 
 | Status | `<C-p>r` | Remote Add Mode | 
 <br>
+
 | Mode | Key | Action | 
 | --------------- | --------------- | --------------- | 
 | Branch | `rn` | Rename branch | 
@@ -49,10 +51,12 @@ Next features will be:
 | Branch | `<C-s>` | Delete branch under cursor | 
 | Branch | `<CR>` | Swith branch to selected branch | 
 <br>
+
 | Mode | Key | Action | 
 | --------------- | --------------- | --------------- | 
 | Edit | `<C-CR>` | Execute command with current input | 
 <br>
+
 | Mode | Key | Action | 
 | --------------- | --------------- | --------------- | 
 | Commit | `<C-CR>` | Execute commit with current message | 
@@ -61,3 +65,4 @@ Next features will be:
 | Commit | `<C-f>` | Insert `[frontend] ` tag | 
 | Commit | `<C-b>` | Insert `[backend] ` tag | 
 <br>
+
