@@ -6,7 +6,6 @@ local Binds = require("binds")
 
 local A = {}
 local M = {
-    active = false
 }
 
 unpack = unpack or table.unpack
@@ -54,7 +53,7 @@ M.show_menu = function (opts)
 end
 
 vim.keymap.set("n", "<leader>ga", function ()
-    if not Helper.active then
+    if not M.buf or not vim.api.nvim_buf_is_loaded(M.buf) then
         M.show_menu()
         Helper.active = true
     end
