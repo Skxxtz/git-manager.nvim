@@ -17,10 +17,10 @@ M.show_menu = function (opts)
     A.win = vim.api.nvim_get_current_win()
     A.buf = vim.api.nvim_win_get_buf(A.win)
 
-    local height = opts.height or 10
+    Helper.height = opts.height or 10
     local win_config = {
         split = "below",
-        height = height,
+        height = Helper.height,
         style = "minimal",
         win = A.win,
     }
@@ -49,7 +49,6 @@ M.show_menu = function (opts)
     if Binds.set_binds("defaults") then
         Git.show_status()
     end
-
 end
 
 vim.keymap.set("n", "<leader>ga", function ()

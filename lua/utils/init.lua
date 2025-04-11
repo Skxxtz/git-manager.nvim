@@ -100,6 +100,13 @@ M.trim = function (string)
     return ""
 end
 
+M.exit_group = vim.api.nvim_create_augroup("SkxxtzExit", { clear = true })
+vim.api.nvim_create_autocmd("VimResized", {
+    group = M.exit_group,
+    callback = function()
+        vim.api.nvim_win_set_height(M.win, M.height);
+    end,
+})
 
 
 return M
