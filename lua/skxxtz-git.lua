@@ -49,6 +49,16 @@ M.show_menu = function (opts)
     if Binds.set_binds("defaults") then
         Git.show_status()
     end
+
+    local resize_group = vim.api.nvim_create_augroup("GitResize", { clear = true })
+    vim.api.nvim_create_autocmd("VimResized", {
+        buffer = M.buf,
+        group = resize_group,
+        callback = function()
+            vim.api.nvim_win_set_height(M.win, Helper.height);
+        end,
+    })
+
 end
 
 vim.keymap.set("n", "<leader>ga", function ()
